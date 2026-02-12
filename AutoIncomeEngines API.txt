@@ -1,0 +1,262 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "AutoIncome Engines™ API",
+    "description": "Automation for Income — Make Money Work for You. A Freedom Wheels™ Platform.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.autoincomeengines.com/v1",
+      "description": "Production Server"
+    },
+    {
+      "url": "http://localhost:3000/v1",
+      "description": "Local Development"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "email": { "type": "string" },
+          "role": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Engine": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "status": { "type": "string", "enum": ["draft", "active", "paused"] },
+          "strategy": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PaymentSession": {
+        "type": "object",
+        "properties": {
+          "sessionId": { "type": "string" },
+          "checkoutUrl": { "type": "string" }
+        }
+      }
+    }
+  },
+  "security": [
+    { "BearerAuth": [] }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Register new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "User registered successfully" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login user",
+        "responses": {
+          "200": { "description": "Returns JWT token" }
+        }
+      }
+    },
+    "/engines": {
+      "get": {
+        "summary": "Get all engines",
+        "responses": {
+          "200": {
+            "description": "List of engines",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Engine" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create new engine",
+        "responses": {
+          "200": { "description": "Engine created" }
+        }
+      }
+    },
+    "/engines/{id}": {
+      "get": {
+        "summary": "Get engine by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Engine details" }
+        }
+      },
+      "put": {
+        "summary": "Update engine"
+      },
+      "delete": {
+        "summary": "Delete engine"
+      }
+    },
+    "/engines/{id}/activate": {
+      "post": {
+        "summary": "Activate engine"
+      }
+    },
+    "/payments/create-session": {
+      "post": {
+        "summary": "Create payment session",
+        "responses": {
+          "200": {
+            "description": "Payment session created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaymentSession" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/learning/modules": {
+      "get": {
+        "summary": "Get learning hub modules"
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "summary": "Admin: Get all users"
+      }
+    }
+  }
+}
+📁 FILE 2: AutoIncome-Engines-Postman-Collection.json
+Import this directly into Postman.
+
+{
+  "info": {
+    "name": "AutoIncome Engines™ API",
+    "_postman_id": "ae-collection-001",
+    "description": "API collection for AutoIncome Engines SaaS",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth - Register",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{base_url}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"email\": \"test@example.com\", \"password\": \"password123\" }"
+        }
+      }
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/auth/login"
+      }
+    },
+    {
+      "name": "Get Engines",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{base_url}}/engines"
+      }
+    },
+    {
+      "name": "Create Engine",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{base_url}}/engines",
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"name\": \"My First Engine\", \"strategy\": \"Lead Funnel\" }"
+        }
+      }
+    }
+  ]
+}
+📁 FILE 3: AutoIncome-Engines-Environment.json
+{
+  "name": "AutoIncome Engines Environment",
+  "values": [
+    { "key": "base_url", "value": "http://localhost:3000/v1" },
+    { "key": "token", "value": "" }
+  ]
+}
+📁 FILE 4: README.md
+# AutoIncome Engines™ API
+
+Automation for Income — Make Money Work for You  
+A Freedom Wheels™ Platform
+
+## Overview
+
+This API powers the AutoIncome Engines SaaS platform, enabling:
+
+- User authentication
+- Engine creation and lifecycle management
+- Automation activation
+- Learning Hub access
+- Payment session creation
+- Admin controls
+
+## Setup
+
+1. Import `autoincome-engines-openapi.json` into Postman.
+2. Import Postman Collection.
+3. Import Environment file.
+4. Set base_url to production or local.
+5. Authenticate and retrieve JWT token.
+6. Add token to environment variable.
+
+## Core Modules
+
+- Auth
+- Engines
+- Payments
+- Learning Hub
+- Admin
